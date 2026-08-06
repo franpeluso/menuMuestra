@@ -12,3 +12,7 @@ out/
 # Archivos del sistema
 .DS_Store
 *.pem
+
+# Prevenir subida accidental de AppData o cachés de Windows
+%AppData%/
+AppData/
