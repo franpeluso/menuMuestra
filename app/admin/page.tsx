@@ -187,18 +187,18 @@ export default function AdminPanelPage() {
       
       {/* HEADER DEL PANEL */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#2D1517] text-[#FDFBF7] border-b border-[#8B262A]/30 backdrop-blur-sm shadow-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
              <span className="text-2xl font-black tracking-tight flex items-center text-[#FDFBF7]">
                grow<span className="text-[#D4AF37] underline decoration-4 underline-offset-4">be</span>
              </span>
             <div className="h-6 w-[1px] bg-[#FDFBF7]/20"></div>
-            <h1 className="text-sm font-bold uppercase tracking-widest text-[#D4AF37]">Admin</h1>
+            <h1 className="text-xs font-bold uppercase tracking-widest text-[#D4AF37]">Admin</h1>
           </div>
           
           <button 
             onClick={handleSignOut}
-            className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border border-[#FDFBF7]/20 hover:bg-[#8B262A]/40 transition-colors text-[#FDFBF7]/90 hover:text-[#FDFBF7]"
+            className="flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-full border border-[#FDFBF7]/20 bg-[#8B262A]/20 hover:bg-[#8B262A]/55 transition-colors text-[#FDFBF7]/90 hover:text-[#FDFBF7]"
           >
             <LogOut className="w-3.5 h-3.5" />
             Cerrar Sesión
@@ -207,26 +207,26 @@ export default function AdminPanelPage() {
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      <section className="pt-28 pb-16 px-6 max-w-7xl mx-auto w-full">
+      <section className="pt-32 pb-16 px-6 max-w-7xl mx-auto w-full">
         
         {/* Título y Botón Principal */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 border-b border-stone-300 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 border-b border-[#8B262A]/20 pb-6">
           <div className="space-y-1">
             <p className="text-xs font-bold uppercase tracking-widest text-[#8B262A]">Gestión de Menú QR</p>
-            <h2 className="text-4xl font-black text-stone-900 tracking-tight uppercase">Panel de Control</h2>
+            <h2 className="text-4xl font-black text-[#2D1517] tracking-tight uppercase">Panel de Control</h2>
           </div>
           <button 
             onClick={openModalForCreate}
-            className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#8B262A] hover:bg-[#8B262A]/90 text-white font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95"
+            className="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#8B262A] hover:bg-[#721c20] text-[#FDFBF7] font-bold text-xs uppercase tracking-widest shadow-md transition-all active:scale-95"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#D4AF37]" />
             Agregar Nuevo Plato
           </button>
         </div>
 
         {/* Manejo de errores */}
         {error && (
-            <div className="bg-red-50 border border-red-200 text-red-900 p-4 rounded-xl flex items-center gap-3 text-sm font-medium mb-6">
+            <div className="bg-[#8B262A]/10 border border-[#8B262A]/30 text-[#2D1517] p-4 rounded-xl flex items-center gap-3 text-sm font-medium mb-6">
                 <XCircle className="w-6 h-6 text-[#8B262A] shrink-0" />
                 <p>{error}</p>
             </div>
@@ -236,12 +236,12 @@ export default function AdminPanelPage() {
         {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3 text-stone-600">
                 <Loader2 className="w-10 h-10 animate-spin text-[#8B262A]" />
-                <p className="text-xs font-bold uppercase tracking-widest">Cargando productos...</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#2D1517]">Cargando productos...</p>
             </div>
         ) : (
-            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-x-auto">
+            <div className="bg-white rounded-2xl border border-stone-200/80 shadow-sm overflow-x-auto">
                 <table className="w-full text-sm">
-                    <thead className="bg-[#2D1517] text-[#FDFBF7] border-b border-stone-200">
+                    <thead className="bg-[#2D1517] text-[#FDFBF7] border-b border-[#8B262A]/30">
                         <tr>
                             <th className="text-left p-5 text-xs font-bold uppercase tracking-widest min-w-[200px]">Producto</th>
                             <th className="text-left p-5 text-xs font-bold uppercase tracking-widest">Categoría</th>
@@ -261,12 +261,12 @@ export default function AdminPanelPage() {
                             </tr>
                         ) : (
                             menuItems.map((item) => (
-                                <tr key={item.id} className={`hover:bg-stone-50 transition-colors ${!item.is_available ? 'opacity-60 bg-stone-50/50' : ''}`}>
+                                <tr key={item.id} className={`hover:bg-[#FDFBF7] transition-colors ${!item.is_available ? 'opacity-60 bg-stone-50/50' : ''}`}>
                                     
                                     {/* Producto */}
                                     <td className="p-5">
                                         <div className="space-y-0.5">
-                                            <p className="font-bold text-base text-stone-900">{item.name}</p>
+                                            <p className="font-bold text-base text-[#2D1517]">{item.name}</p>
                                             <p className="text-xs text-stone-600 leading-relaxed max-w-sm line-clamp-1 font-serif italic">{item.description}</p>
                                         </div>
                                     </td>
@@ -341,19 +341,19 @@ export default function AdminPanelPage() {
       {/* MODAL DE FORMULARIO (Crear/Editar) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#2D1517]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl border border-stone-200 shadow-2xl w-full max-w-2xl p-8 sm:p-10 my-8 space-y-8">
+          <div className="bg-[#FDFBF7] rounded-3xl border border-[#8B262A]/20 shadow-2xl w-full max-w-2xl p-8 sm:p-10 my-8 space-y-8">
             
-            <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-6">
+            <div className="flex items-center justify-between gap-4 border-b border-[#8B262A]/20 pb-6">
                 <div className="space-y-1">
                     <Package className="w-7 h-7 text-[#8B262A]" />
-                    <h3 className="text-3xl font-black text-stone-900 tracking-tight uppercase pt-2">
+                    <h3 className="text-3xl font-black text-[#2D1517] tracking-tight uppercase pt-2">
                         {editingItem ? `Editar plato` : `Nuevo plato`}
                     </h3>
                     <p className="text-stone-600 text-sm font-serif italic">
                         {editingItem ? `Complete los campos para actualizar "${editingItem.name}"` : `Complete los datos del nuevo integrante de la carta`}
                     </p>
                 </div>
-                <button onClick={closeModal} className="p-2 rounded-lg text-stone-500 hover:bg-stone-100">
+                <button onClick={closeModal} className="p-2 rounded-lg text-stone-500 hover:bg-stone-200/50">
                     <XCircle className="w-6 h-6" />
                 </button>
             </div>
@@ -363,7 +363,7 @@ export default function AdminPanelPage() {
               {/* Nombre */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Nombre del Plato</label>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Milanesa con Fritas" />
+                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Milanesa con Fritas" />
               </div>
 
               {/* Categoría */}
@@ -380,13 +380,13 @@ export default function AdminPanelPage() {
               {/* Subcategoría */}
               <div className="space-y-1">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Subcategoría</label>
-                <input type="text" name="subcategory" value={formData.subcategory} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Minutas, Cervezas, Tortas" />
+                <input type="text" name="subcategory" value={formData.subcategory} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Minutas, Cervezas, Tortas" />
               </div>
 
               {/* Precio */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Precio (ARS)</label>
-                <input type="number" name="price" value={formData.price} onChange={handleInputChange} required min="0" step="0.01" className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-bold text-lg text-[#8B262A]" placeholder="0.00" />
+                <input type="number" name="price" value={formData.price} onChange={handleInputChange} required min="0" step="0.01" className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-bold text-lg text-[#8B262A]" placeholder="0.00" />
               </div>
 
               {/* Checkboxes de Estado */}
@@ -403,22 +403,22 @@ export default function AdminPanelPage() {
               {/* Descripción */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Descripción / Ingredientes (Opcional)</label>
-                <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-serif italic" placeholder="ej. Con queso cheddar, bacon crocante y huevo frito. Acompañada de fritas." />
+                <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-serif italic" placeholder="ej. Con queso cheddar, bacon crocante y huevo frito. Acompañada de fritas." />
               </div>
 
               {/* Botones */}
-              <div className="md:col-span-2 flex items-center justify-end gap-3 pt-6 border-t border-stone-200 mt-4">
+              <div className="md:col-span-2 flex items-center justify-end gap-3 pt-6 border-t border-[#8B262A]/20 mt-4">
                 <button 
                     type="button" 
                     onClick={closeModal} 
-                    className="px-6 py-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold text-xs uppercase tracking-widest transition-colors"
+                    className="px-6 py-3 rounded-xl bg-stone-200/60 hover:bg-stone-200 text-stone-800 font-semibold text-xs uppercase tracking-widest transition-colors"
                 >
                     Cancelar
                 </button>
                 <button 
                     type="submit" 
                     disabled={formLoading}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#8B262A] hover:bg-[#8B262A]/90 text-white font-bold text-xs uppercase tracking-widest shadow-md transition-all disabled:opacity-60"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#8B262A] hover:bg-[#721c20] text-[#FDFBF7] font-bold text-xs uppercase tracking-widest shadow-md transition-all disabled:opacity-60"
                 >
                     {formLoading ? (
                         <>
