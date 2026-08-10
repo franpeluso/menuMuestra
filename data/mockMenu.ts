@@ -5,7 +5,8 @@ export interface MenuItem {
   price: number;
   category: string;
   subcategory: string;
-  isGlutenFree?: boolean;
+  is_gluten_free?: boolean;
+  is_available?: boolean; // 👈 Le agregamos '?' para que no falle si algún item antiguo no lo tiene explícito
 }
 
 export const MAIN_CATEGORIES = [
@@ -24,6 +25,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 2800,
     category: 'cafeteria',
     subcategory: 'Cafetería Tradicional',
+    is_available: true,
   },
   {
     id: 'c2',
@@ -32,6 +34,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 3200,
     category: 'cafeteria',
     subcategory: 'Cafetería Tradicional',
+    is_available: true,
   },
   {
     id: 'c3',
@@ -40,6 +43,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 3600,
     category: 'cafeteria',
     subcategory: 'Cafetería Especial',
+    is_available: true,
   },
   {
     id: 'c4',
@@ -48,6 +52,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 4200,
     category: 'cafeteria',
     subcategory: 'Cafetería Especial',
+    is_available: true,
   },
   {
     id: 'c5',
@@ -56,6 +61,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 5500,
     category: 'cafeteria',
     subcategory: 'Opciones de Merienda',
+    is_available: true,
   },
   {
     id: 'c6',
@@ -64,6 +70,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 4800,
     category: 'cafeteria',
     subcategory: 'Tortas & Pastelería',
+    is_available: true,
   },
   {
     id: 'c7',
@@ -72,6 +79,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 5200,
     category: 'cafeteria',
     subcategory: 'Tortas & Pastelería',
+    is_available: true,
   },
 
   // ================= COCINA =================
@@ -82,6 +90,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 16000,
     category: 'cocina',
     subcategory: 'Entradas & Para Compartir',
+    is_available: true,
   },
   {
     id: 'k2',
@@ -90,6 +99,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 25000,
     category: 'cocina',
     subcategory: 'Entradas & Para Compartir',
+    is_available: true,
   },
   {
     id: 'k3',
@@ -98,6 +108,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 12500,
     category: 'cocina',
     subcategory: 'Platos Principales',
+    is_available: true,
   },
   {
     id: 'k4',
@@ -106,6 +117,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 28000,
     category: 'cocina',
     subcategory: 'Platos Principales',
+    is_available: true,
   },
   {
     id: 'k5',
@@ -114,6 +126,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 7800,
     category: 'cocina',
     subcategory: 'Postres',
+    is_available: true,
   },
 
   // ================= BEBIDAS =================
@@ -124,6 +137,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 3200,
     category: 'bebidas',
     subcategory: 'Sin Alcohol',
+    is_available: true,
   },
   {
     id: 'b2',
@@ -132,6 +146,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 2200,
     category: 'bebidas',
     subcategory: 'Sin Alcohol',
+    is_available: true,
   },
   {
     id: 'b3',
@@ -140,6 +155,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 6500,
     category: 'bebidas',
     subcategory: 'Tragos & Coctelería',
+    is_available: true,
   },
   {
     id: 'b4',
@@ -148,6 +164,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 7200,
     category: 'bebidas',
     subcategory: 'Tragos & Coctelería',
+    is_available: true,
   },
   {
     id: 'b5',
@@ -156,6 +173,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 4500,
     category: 'bebidas',
     subcategory: 'Cervezas',
+    is_available: true,
   },
   {
     id: 'b6',
@@ -164,6 +182,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 18500,
     category: 'bebidas',
     subcategory: 'Vinos & Espumantes',
+    is_available: true,
   },
 
   // ================= SIN TACC =================
@@ -174,7 +193,8 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 6500,
     category: 'sintacc',
     subcategory: 'Cafetería & Salados',
-    isGlutenFree: true,
+    is_gluten_free: true,
+    is_available: true,
   },
   {
     id: 'st2',
@@ -183,7 +203,8 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 5800,
     category: 'sintacc',
     subcategory: 'Pastelería & Dulces',
-    isGlutenFree: true,
+    is_gluten_free: true,
+    is_available: true,
   },
   {
     id: 'st3',
@@ -192,6 +213,7 @@ export const MOCK_ITEMS: MenuItem[] = [
     price: 23500,
     category: 'sintacc',
     subcategory: 'Platos Elaborados',
-    isGlutenFree: true,
+    is_gluten_free: true,
+    is_available: true,
   },
 ];
