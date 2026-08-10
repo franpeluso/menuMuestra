@@ -24,7 +24,7 @@ function LoginForm() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -33,12 +33,13 @@ function LoginForm() {
         throw new Error('Credenciales inválidas. Por favor verifique su email y contraseña.')
       }
 
-      router.push(redirectTo)
-      router.refresh() 
+      if (data?.session) {
+        // Redirección completa de ventana para enviar las cookies/sesión de Supabase
+        window.location.href = redirectTo
+      }
 
     } catch (err: any) {
       setError(err.message)
-    } finally {
       setLoading(false)
     }
   }
