@@ -30,7 +30,7 @@ export default function AdminPanelPage() {
     is_available: true,
   });
 
-  // 1. Cargar TODOS los productos (Optimizado con useCallback para evitar bucles)
+  // 1. Cargar TODOS los productos (Optimizado con useCallback)
   const fetchAllItems = useCallback(async () => {
     try {
       setLoading(true);
@@ -60,11 +60,10 @@ export default function AdminPanelPage() {
           router.replace('/login?redirectedFrom=/admin');
           return;
         }
-        // Si hay sesión, cargamos los datos inmediatamente
         await fetchAllItems();
       } catch (err) {
         console.error('Error al verificar sesión:', err);
-        setLoading(false); // Nos aseguramos de quitar el loading si falla
+        setLoading(false);
       }
     };
 
