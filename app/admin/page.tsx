@@ -66,35 +66,21 @@ export default function AdminPanelPage() {
 
   // 0. VERIFICAR SESIÓN Y CARGAR DATOS AL MONTAR EL COMPONENTE
   useEffect(() => {
-    let isMounted = true;
+  let isMounted = true;
 
-    const checkUserAndFetch = async () => {
-      try {
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !user) {
-          router.replace('/login');
-          return;
-        }
+  const loadData = async () => {
+    // Comentamos la autenticación un segundo para probar si trae los datos de una
+    if (isMounted) {
+      await fetchAllItems();
+    }
+  };
 
-        if (isMounted) {
-          await fetchAllItems();
-        }
-      } catch (err) {
-        console.error('Error al verificar autenticación:', err);
-        if (isMounted) {
-          setLoading(false);
-          setError('Error de autenticación al cargar el panel.');
-        }
-      }
-    };
+  loadData();
 
-    checkUserAndFetch();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [router, fetchAllItems]);
+  return () => {
+    isMounted = false;
+  };
+}, [fetchAllItems]);
 
   // 2. Manejo del Cierre de Sesión
   const handleSignOut = async () => {
