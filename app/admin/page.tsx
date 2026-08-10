@@ -29,6 +29,20 @@ export default function AdminPanelPage() {
     is_available: true,
   });
 
+  // 0. VERIFICAR SESIÓN AL CARGAR EL PANEL
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace('/login?redirectedFrom=/admin');
+        return;
+      }
+      fetchAllItems();
+    };
+
+    checkUser();
+  }, [router]);
+
   // 1. Cargar TODOS los productos al iniciar
   const fetchAllItems = async () => {
     try {

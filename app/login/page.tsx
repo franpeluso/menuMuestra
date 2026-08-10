@@ -3,7 +3,7 @@
 
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase' 
+import { supabase } from '@/lib/supabaseClient'
 import { Loader2, LogIn, AlertTriangle } from 'lucide-react'
 
 // 1. Creamos un componente interno que maneja el formulario y usa useSearchParams
