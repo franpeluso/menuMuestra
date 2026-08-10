@@ -54,12 +54,18 @@ export default function AdminPanelPage() {
   // 0. VERIFICAR SESIÓN Y CARGAR DATOS AL MONTAR EL COMPONENTE
   useEffect(() => {
     const checkUserAndFetch = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login?redirectedFrom=/admin');
-        return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          router.replace('/login?redirectedFrom=/admin');
+          return;
+        }
+        // Si hay sesión, cargamos los datos inmediatamente
+        await fetchAllItems();
+      } catch (err) {
+        console.error('Error al verificar sesión:', err);
+        setLoading(false); // Nos aseguramos de quitar el loading si falla
       }
-      await fetchAllItems();
     };
 
     checkUserAndFetch();
@@ -194,7 +200,7 @@ export default function AdminPanelPage() {
                grow<span className="text-[#185DF1] underline decoration-4 underline-offset-4">be</span>
              </span>
             <div className="h-6 w-[1px] bg-[#F3F7FE]/20"></div>
-            <h1 className="text-sm font-bold uppercase tracking-widest text-[#185DF1]">Admin</h1>
+            <h1 className="text-sm font-bold uppercase tracking-widest text-[#185DF1]">Admin Menu QR</h1>
           </div>
           
           <button
