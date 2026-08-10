@@ -1,6 +1,8 @@
 // app/login/page.tsx
 'use client'
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 // Importamos el cliente de supabase público que ya tienes creado en @/lib/supabase
