@@ -13,12 +13,10 @@ export default function AdminPanelPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Estados para el manejo de los formularios (Modales)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Estado del formulario adaptado a tu esquema exacto de base de datos
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -29,11 +27,11 @@ export default function AdminPanelPage() {
     is_available: true,
   });
 
-  // 0. VERIFICAR SESIÓN AL CARGAR EL PANEL
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        console.warn('No hay sesión activa, redirigiendo al login...');
         router.replace('/login?redirectedFrom=/admin');
         return;
       }
@@ -43,7 +41,6 @@ export default function AdminPanelPage() {
     checkUser();
   }, [router]);
 
-  // 1. Cargar TODOS los productos al iniciar
   const fetchAllItems = async () => {
     try {
       setLoading(true);
@@ -55,23 +52,27 @@ export default function AdminPanelPage() {
         .order('category', { ascending: true })
         .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error devuelto por Supabase:', error);
+        throw error;
+      }
+
+      console.log('Platos cargados exitosamente:', data);
       if (data) setMenuItems(data);
     } catch (err: any) {
-      setError('Error al cargar el menú: ' + err.message);
+      console.error('Excepción al cargar el menú:', err);
+      setError('Error al cargar el menú: ' + (err.message || JSON.stringify(err)));
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Manejo del Cierre de Sesión
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
   };
 
-  // 3. Manejo de Formularios (Abrir/Cerrar Modal)
   const openModalForCreate = () => {
     setEditingItem(null);
     setFormData({
@@ -108,11 +109,9 @@ export default function AdminPanelPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-    
     setFormData(prev => ({ ...prev, [name]: finalValue }));
   };
 
-  // 4. Enviar Formulario (Crear o Actualizar)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -141,30 +140,26 @@ export default function AdminPanelPage() {
           .from('menu_items')
           .update(itemData)
           .eq('id', editingItem.id);
-
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('menu_items')
           .insert([itemData]);
-
         if (error) throw error;
       }
 
       closeModal();
       fetchAllItems();
     } catch (err: any) {
+      console.error('Error al guardar:', err);
       setError('Error al guardar el producto: ' + err.message);
     } finally {
       setFormLoading(false);
     }
   };
 
-  // 5. Eliminar un producto (DELETE)
   const handleDeleteItem = async (id: string | number, name: string) => {
-    if (!confirm(`¿Está seguro que desea eliminar definitivamente el plato "${name}"? Esta acción no se puede deshacer.`)) {
-      return;
-    }
+    if (!confirm(`¿Está seguro que desea eliminar definitivamente el plato "${name}"?`)) return;
 
     try {
       setFormLoading(true);
@@ -176,6 +171,7 @@ export default function AdminPanelPage() {
       if (error) throw error;
       fetchAllItems();
     } catch (err: any) {
+      console.error('Error al eliminar:', err);
       setError('Error al eliminar el producto: ' + err.message);
     } finally {
       setFormLoading(false);
@@ -184,8 +180,6 @@ export default function AdminPanelPage() {
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-stone-900 font-sans antialiased">
-      
-      {/* HEADER DEL PANEL */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#2D1517] text-[#FDFBF7] border-b border-[#8B262A]/30 backdrop-blur-sm shadow-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -206,10 +200,7 @@ export default function AdminPanelPage() {
         </div>
       </header>
 
-      {/* CONTENIDO PRINCIPAL */}
       <section className="pt-32 pb-16 px-6 max-w-7xl mx-auto w-full">
-        
-        {/* Título y Botón Principal */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 border-b border-[#8B262A]/20 pb-6">
           <div className="space-y-1">
             <p className="text-xs font-bold uppercase tracking-widest text-[#8B262A]">Gestión de Menú QR</p>
@@ -224,7 +215,6 @@ export default function AdminPanelPage() {
           </button>
         </div>
 
-        {/* Manejo de errores */}
         {error && (
             <div className="bg-[#8B262A]/10 border border-[#8B262A]/30 text-[#2D1517] p-4 rounded-xl flex items-center gap-3 text-sm font-medium mb-6">
                 <XCircle className="w-6 h-6 text-[#8B262A] shrink-0" />
@@ -232,7 +222,6 @@ export default function AdminPanelPage() {
             </div>
         )}
 
-        {/* TABLA DE PRODUCTOS */}
         {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3 text-stone-600">
                 <Loader2 className="w-10 h-10 animate-spin text-[#8B262A]" />
@@ -262,27 +251,17 @@ export default function AdminPanelPage() {
                         ) : (
                             menuItems.map((item) => (
                                 <tr key={item.id} className={`hover:bg-[#FDFBF7] transition-colors ${!item.is_available ? 'opacity-60 bg-stone-50/50' : ''}`}>
-                                    
-                                    {/* Producto */}
                                     <td className="p-5">
                                         <div className="space-y-0.5">
                                             <p className="font-bold text-base text-[#2D1517]">{item.name}</p>
                                             <p className="text-xs text-stone-600 leading-relaxed max-w-sm line-clamp-1 font-serif italic">{item.description}</p>
                                         </div>
                                     </td>
-
-                                    {/* Categoría */}
                                     <td className="p-5 capitalize text-stone-700">{item.category}</td>
-                                    
-                                    {/* Subcategoría */}
                                     <td className="p-5 font-medium text-stone-800">{item.subcategory}</td>
-
-                                    {/* Precio */}
                                     <td className="p-5 font-black text-lg text-[#8B262A]">
                                         ${item.price.toLocaleString('es-AR')}
                                     </td>
-
-                                    {/* Sin TACC */}
                                     <td className="p-5 text-center">
                                         {(item as any).is_gluten_free ? (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold" title="Apto Celíacos">
@@ -293,8 +272,6 @@ export default function AdminPanelPage() {
                                             <span className="text-stone-400 text-xs">-</span>
                                         )}
                                     </td>
-
-                                    {/* Estado */}
                                     <td className="p-5 text-center">
                                         {item.is_available ? (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
@@ -308,8 +285,6 @@ export default function AdminPanelPage() {
                                             </span>
                                         )}
                                     </td>
-
-                                    {/* Acciones */}
                                     <td className="p-5 text-center">
                                         <div className="flex items-center justify-center gap-2">
                                             <button 
@@ -338,20 +313,15 @@ export default function AdminPanelPage() {
         )}
       </section>
 
-      {/* MODAL DE FORMULARIO (Crear/Editar) */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#2D1517]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-[#FDFBF7] rounded-3xl border border-[#8B262A]/20 shadow-2xl w-full max-w-2xl p-8 sm:p-10 my-8 space-y-8">
-            
             <div className="flex items-center justify-between gap-4 border-b border-[#8B262A]/20 pb-6">
                 <div className="space-y-1">
                     <Package className="w-7 h-7 text-[#8B262A]" />
                     <h3 className="text-3xl font-black text-[#2D1517] tracking-tight uppercase pt-2">
                         {editingItem ? `Editar plato` : `Nuevo plato`}
                     </h3>
-                    <p className="text-stone-600 text-sm font-serif italic">
-                        {editingItem ? `Complete los campos para actualizar "${editingItem.name}"` : `Complete los datos del nuevo integrante de la carta`}
-                    </p>
                 </div>
                 <button onClick={closeModal} className="p-2 rounded-lg text-stone-500 hover:bg-stone-200/50">
                     <XCircle className="w-6 h-6" />
@@ -359,14 +329,11 @@ export default function AdminPanelPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Nombre */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Nombre del Plato</label>
                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Milanesa con Fritas" />
               </div>
 
-              {/* Categoría */}
               <div className="space-y-1">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Categoría Principal</label>
                 <select name="category" value={formData.category} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm bg-white capitalize">
@@ -377,19 +344,16 @@ export default function AdminPanelPage() {
                 </select>
               </div>
 
-              {/* Subcategoría */}
               <div className="space-y-1">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Subcategoría</label>
-                <input type="text" name="subcategory" value={formData.subcategory} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Minutas, Cervezas, Tortas" />
+                <input type="text" name="subcategory" value={formData.subcategory} onChange={handleInputChange} required className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm" placeholder="ej. Minutas, Cervezas" />
               </div>
 
-              {/* Precio */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Precio (ARS)</label>
                 <input type="number" name="price" value={formData.price} onChange={handleInputChange} required min="0" step="0.01" className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-bold text-lg text-[#8B262A]" placeholder="0.00" />
               </div>
 
-              {/* Checkboxes de Estado */}
               <div className="flex items-center gap-3 pt-2">
                 <input type="checkbox" name="is_gluten_free" checked={formData.is_gluten_free} onChange={handleInputChange} className="w-5 h-5 accent-[#8B262A] rounded border-stone-300" id="is_gluten_free" />
                 <label htmlFor="is_gluten_free" className="text-sm font-semibold text-stone-800">¿Es apto celíacos (Sin TACC)?</label>
@@ -400,13 +364,11 @@ export default function AdminPanelPage() {
                 <label htmlFor="is_available" className="text-sm font-semibold text-stone-800">¿Producto disponible?</label>
               </div>
 
-              {/* Descripción */}
               <div className="space-y-1 md:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-stone-700">Descripción / Ingredientes (Opcional)</label>
-                <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-serif italic" placeholder="ej. Con queso cheddar, bacon crocante y huevo frito. Acompañada de fritas." />
+                <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-[#8B262A]/30 focus:border-[#8B262A] text-sm font-serif italic" placeholder="ej. Con queso cheddar y bacon." />
               </div>
 
-              {/* Botones */}
               <div className="md:col-span-2 flex items-center justify-end gap-3 pt-6 border-t border-[#8B262A]/20 mt-4">
                 <button 
                     type="button" 
@@ -420,17 +382,9 @@ export default function AdminPanelPage() {
                     disabled={formLoading}
                     className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#8B262A] hover:bg-[#721c20] text-[#FDFBF7] font-bold text-xs uppercase tracking-widest shadow-md transition-all disabled:opacity-60"
                 >
-                    {formLoading ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Guardando...
-                        </>
-                    ) : (
-                        editingItem ? 'Actualizar Plato' : 'Crear Plato'
-                    )}
+                    {formLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingItem ? 'Actualizar Plato' : 'Crear Plato')}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
