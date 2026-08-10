@@ -5,8 +5,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { MenuItem } from '@/data/mockMenu';
 import { Loader2, Plus, Pencil, Trash2, LogOut, Package, CheckCircle, XCircle, WheatOff } from 'lucide-react';
+
+// Interfaz propia para asegurar que coincida con Supabase y evitar choques de tipos
+interface MenuItem {
+  id: string | number;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  subcategory: string;
+  is_gluten_free?: boolean;
+  is_available?: boolean;
+  created_at?: string;
+}
 
 export default function AdminPanelPage() {
   const router = useRouter();
@@ -30,22 +42,23 @@ export default function AdminPanelPage() {
     is_available: true,
   });
 
-  // 1. Cargar TODOS los productos (Optimizado con useCallback)
+  // 1. Cargar TODOS los productos
   const fetchAllItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('menu_items')
         .select('*')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
       if (data) setMenuItems(data);
     } catch (err: any) {
-      setError('Error al cargar el menú: ' + err.message);
+      console.error('Error al cargar menú:', err);
+      setError('Error al cargar el menú: ' + (err.message || 'Error desconocido'));
     } finally {
       setLoading(false);
     }
@@ -57,11 +70,10 @@ export default function AdminPanelPage() {
 
     const checkUserAndFetch = async () => {
       try {
-        // Usamos getUser() en lugar de getSession() para validar de forma segura en el cliente
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
         
-        if (error || !user) {
-          router.replace('/login?redirectedFrom=/admin');
+        if (authError || !user) {
+          router.replace('/login');
           return;
         }
 
@@ -79,7 +91,6 @@ export default function AdminPanelPage() {
 
     checkUserAndFetch();
 
-    // Limpieza si el componente se desmonta rápido
     return () => {
       isMounted = false;
     };
@@ -114,8 +125,8 @@ export default function AdminPanelPage() {
       description: item.description || '',
       price: item.price.toString(),
       category: item.category,
-      subcategory: item.subcategory,
-      is_gluten_free: (item as any).is_gluten_free ?? false,
+      subcategory: item.subcategory || '',
+      is_gluten_free: item.is_gluten_free ?? false,
       is_available: item.is_available ?? true,
     });
     setIsModalOpen(true);
@@ -127,10 +138,11 @@ export default function AdminPanelPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    const target = e.target;
+    const value = target.type === 'checkbox' ? (target as HTMLInputElement).checked : target.value;
+    const name = target.name;
     
-    setFormData(prev => ({ ...prev, [name]: finalValue }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // 4. Enviar Formulario (Crear o Actualizar)
@@ -158,18 +170,18 @@ export default function AdminPanelPage() {
 
     try {
       if (editingItem) {
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('menu_items')
           .update(itemData)
           .eq('id', editingItem.id);
 
-        if (error) throw error;
+        if (updateError) throw updateError;
       } else {
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('menu_items')
           .insert([itemData]);
 
-        if (error) throw error;
+        if (insertError) throw insertError;
       }
 
       closeModal();
@@ -183,18 +195,18 @@ export default function AdminPanelPage() {
 
   // 5. Eliminar un producto (DELETE)
   const handleDeleteItem = async (id: string | number, name: string) => {
-    if (!confirm(`¿Está seguro que desea eliminar definitivamente el plato "${name}"? Esta acción no se puede deshacer.`)) {
+    if (!confirm(`¿Está seguro que desea eliminar definitivamente el plato "${name}"?`)) {
       return;
     }
 
     try {
       setFormLoading(true);
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('menu_items')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
       await fetchAllItems();
     } catch (err: any) {
       setError('Error al eliminar el producto: ' + err.message);
@@ -282,7 +294,7 @@ export default function AdminPanelPage() {
                             </tr>
                         ) : (
                             menuItems.map((item) => (
-                                <tr key={item.id} className={`hover:bg-stone-50 transition-colors ${!item.is_available ? 'opacity-60 bg-stone-50/50' : ''}`}>
+                                <tr key={item.id} className={`hover:bg-stone-50 transition-colors ${item.is_available === false ? 'opacity-60 bg-stone-50/50' : ''}`}>
                                     
                                     {/* Producto */}
                                     <td className="p-5">
@@ -300,12 +312,12 @@ export default function AdminPanelPage() {
 
                                     {/* Precio */}
                                     <td className="p-5 font-black text-lg text-stone-950">
-                                        ${item.price.toLocaleString('es-AR')}
+                                        ${item.price?.toLocaleString('es-AR')}
                                     </td>
 
                                     {/* Sin TACC */}
                                     <td className="p-5 text-center">
-                                        {(item as any).is_gluten_free ? (
+                                        {item.is_gluten_free ? (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 text-xs font-bold" title="Apto Celíacos">
                                                 <WheatOff className="w-3.5 h-3.5 text-amber-600" />
                                                 Sin TACC
@@ -317,7 +329,7 @@ export default function AdminPanelPage() {
 
                                     {/* Estado */}
                                     <td className="p-5 text-center">
-                                        {item.is_available ? (
+                                        {item.is_available !== false ? (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-800 border border-green-200 text-xs font-semibold">
                                                 <CheckCircle className="w-3.5 h-3.5" />
                                                 Disponible
