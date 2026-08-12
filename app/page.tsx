@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Navbar from '@/components/Navbar';
 import CategoryFilter from '@/components/CategoryFilter';
 import MenuItemCard from '@/components/MenuItemCard';
@@ -10,11 +10,12 @@ import { MAIN_CATEGORIES, MenuItem } from '@/data/mockMenu';
 import { supabase } from '@/lib/supabase';
 import { MapPin, Clock, Phone, Loader2 } from 'lucide-react';
 
-
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('cafeteria');
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  const categoryHeaderRef = useRef<HTMLDivElement>(null);
 
   // 1. Obtener datos desde Supabase
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Home() {
         const { data, error } = await supabase
           .from('menu_items')
           .select('*')
-          .eq('is_available', true); // Trae solo los productos disponibles
+          .eq('is_available', true);
 
         if (error) throw error;
         if (data) setMenuItems(data);
@@ -38,12 +39,20 @@ export default function Home() {
     fetchMenuItems();
   }, []);
 
-  // 2. Filtrar ítems por la categoría seleccionada
+  // 2. Cambio de categoría con scroll suave asegurando espacio para el header fijo
+  const handleSelectCategory = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    if (categoryHeaderRef.current) {
+      categoryHeaderRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // 3. Filtrar ítems por la categoría seleccionada
   const categoryItems = menuItems.filter(
     (item) => item.category === selectedCategory
   );
 
-  // 3. Agrupar ítems por Subcategoría
+  // 4. Agrupar ítems por Subcategoría
   const groupedItems = categoryItems.reduce<Record<string, MenuItem[]>>(
     (acc, item) => {
       if (!acc[item.subcategory]) {
@@ -63,7 +72,7 @@ export default function Home() {
       <Navbar />
 
       {/* --- SECCIÓN CARTA --- */}
-      <section id="carta" className="max-w-4xl mx-auto px-4 py-8 w-full flex-1 scroll-mt-20">
+      <section id="carta" className="max-w-4xl mx-auto px-4 py-8 w-full flex-1 scroll-mt-28">
         <div className="text-center space-y-2 mb-4">
           <p className="italic text-stone-600 font-serif text-lg">
             Descubrí nuestros sabores
@@ -77,11 +86,11 @@ export default function Home() {
         {/* Botones de Categorías Principales */}
         <CategoryFilter
           selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          onSelectCategory={handleSelectCategory}
         />
 
-        {/* Título Principal de Sección */}
-        <div className="mt-6 mb-10 text-center">
+        {/* Título Principal de Sección con un scroll-mt más alto para evitar que el header lo tape */}
+        <div ref={categoryHeaderRef} className="mt-6 mb-10 text-center scroll-mt-36">
           <h3 className="text-3xl font-black text-[#8B262A] tracking-wider uppercase">
             {currentCategoryName}
           </h3>
@@ -124,7 +133,7 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN NOSOTROS --- */}
-      <section id="nosotros" className="pt-16 pb-6 px-4 max-w-3xl mx-auto text-center space-y-4 scroll-mt-20">
+      <section id="nosotros" className="pt-16 pb-6 px-4 max-w-3xl mx-auto text-center space-y-4 scroll-mt-28">
         <span className="text-xs font-bold text-[#8B262A] tracking-widest uppercase bg-red-100 px-3 py-1 rounded-full">
           Bienvenidos
         </span>
@@ -137,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN CONTACTO --- */}
-      <section id="contacto" className="bg-[#f0e5d8] py-16 px-4 border-t border-stone-300/60 scroll-mt-20 mt-16">
+      <section id="contacto" className="bg-[#f0e5d8] py-16 px-4 border-t border-stone-300/60 scroll-mt-28 mt-16">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl sm:text-4xl font-black text-[#8B262A] tracking-wider uppercase">

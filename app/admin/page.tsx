@@ -215,13 +215,10 @@ export default function AdminPanelPage() {
             <h1 className="text-sm font-bold uppercase tracking-widest text-[#185DF1]">Admin Menu QR</h1>
           </div>
           
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border border-[#F3F7FE]/20 hover:bg-[#F3F7FE]/10 transition-colors text-[#F3F7FE]/80 hover:text-[#F3F7FE]"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Cerrar Sesión
-          </button>
+          <div className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/20 text-emerald-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Suscripción Activa
+          </div>
         </div>
       </header>
 
