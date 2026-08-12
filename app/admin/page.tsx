@@ -65,6 +65,8 @@ export default function AdminPanelPage() {
         query = query.order('name', { ascending: sortOrder });
       } else if (sortBy === 'price') {
         query = query.order('price', { ascending: sortOrder });
+      } else if (sortBy === 'subcategory') {
+        query = query.order('subcategory', { ascending: sortOrder }).order('name', { ascending: true });
       } else {
         // Orden por defecto por categoría, luego por nombre
         query = query.order('category', { ascending: sortOrder }).order('name', { ascending: true });
