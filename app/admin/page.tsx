@@ -322,9 +322,9 @@ export default function AdminPanelPage() {
               >
                 <option value="all">Todas las categorías</option>
                 <option value="cafeteria">Cafetería</option>
-                <option value="platos_principales">Platos Principales</option>
+                <option value="cocina">Cocina</option>
                 <option value="bebidas">Bebidas</option>
-                <option value="postres">Postres</option>
+                <option value="sintacc">Sin Tacc</option>
               </select>
 
               {/* Filtro por Estado de Disponibilidad */}
@@ -377,7 +377,7 @@ export default function AdminPanelPage() {
                 title="Cambiar dirección de orden"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-stone-500" />
-                {sortOrder ? 'Asc' : 'Desc'}
+                {sortOrder ? 'Ascendente' : 'Descendente'}
               </button>
             </div>
           </div>
