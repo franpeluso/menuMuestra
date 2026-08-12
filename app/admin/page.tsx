@@ -28,7 +28,7 @@ export default function AdminPanelPage() {
 
   // Estados para búsqueda y ordenamiento
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'category'>('category');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'category' | 'subcategory'>('category');
   const [sortOrder, setSortOrder] = useState<boolean>(true); // true = ascendente, false = descendente
 
   // NUEVOS ESTADOS DE FILTRADO
