@@ -363,12 +363,13 @@ export default function AdminPanelPage() {
               
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'category')}
+                onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'category' | 'subcategory')}
                 className="px-3 py-1.5 rounded-lg border border-stone-200 text-xs bg-stone-50 font-medium text-stone-700 focus:outline-none"
               >
                 <option value="category">Categoría</option>
                 <option value="name">Nombre</option>
                 <option value="price">Precio</option>
+                <option value="subcategory">Subcategoría</option>
               </select>
 
               <button
