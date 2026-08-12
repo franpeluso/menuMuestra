@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="pt-2 text-xs">
           Desarrollado por{' '}
           <span className="font-extrabold text-white tracking-wider hover:text-red-300 transition-colors cursor-pointer">
-            nextech Software Studio
+            growbe Software Studio
           </span>
         </div>
       </div>
