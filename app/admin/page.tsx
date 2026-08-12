@@ -260,7 +260,7 @@ export default function AdminPanelPage() {
           <div className="flex items-center gap-4">
             {/* BOTÓN SOPORTE / WHATSAPP EN EL HEADER */}
             <a
-              href="https://wa.me/5491100000000?text=Hola,%20necesito%20soporte%20con%20mi%20panel%20de%20administracion%20del%20Menu%20QR."
+              href="https://wa.me/5492216813359?text=Hola,%20necesito%20soporte%20con%20mi%20panel%20de%20administracion%20del%20Menu%20QR."
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all"
@@ -507,7 +507,7 @@ export default function AdminPanelPage() {
             <p className="text-xs sm:text-sm text-stone-200">Contactate directamente con el desarrollador técnico para recibir asistencia inmediata por WhatsApp.</p>
           </div>
           <a
-            href="https://wa.me/5491100000000?text=Hola,%20necesito%20asistencia%20con%20el%20sistema%20de%20Menu%20QR."
+            href="https://wa.me/5492216813359?text=Hola,%20necesito%20soporte%20con%20mi%20panel%20de%20administracion%20del%20Menu%20QR."
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest shadow-md transition-all shrink-0 active:scale-95"

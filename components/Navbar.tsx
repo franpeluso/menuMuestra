@@ -27,7 +27,7 @@ export default function Navbar() {
           <a href="#contacto" className="hover:opacity-80 transition-opacity">CONTACTO</a>
           
           <a
-            href="https://wa.me/123456789"
+            href="https://wa.me/5492216813359"
             target="_blank"
             rel="noopener noreferrer"
             className="ml-4 px-5 py-2.5 bg-white text-[#8B262A] rounded-md font-extrabold text-xs tracking-wider uppercase hover:bg-zinc-100 transition-colors shadow"
@@ -52,7 +52,7 @@ export default function Navbar() {
           <a href="#carta" className="block text-white" onClick={() => setIsOpen(false)}>CARTA</a>
           <a href="#contacto" className="block text-white" onClick={() => setIsOpen(false)}>CONTACTO</a>
           <a
-            href="https://wa.me/123456789"
+            href="https://wa.me/5492216813359"
             target="_blank"
             rel="noopener noreferrer"
             className="block text-center py-3 bg-white text-[#8B262A] rounded font-extrabold"
