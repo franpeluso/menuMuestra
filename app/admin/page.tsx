@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Loader2, Plus, Pencil, Trash2, LogOut, Package, CheckCircle, XCircle, WheatOff } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Package, CheckCircle, XCircle, WheatOff, Search, ArrowUpDown } from 'lucide-react';
 
 // Interfaz propia para asegurar que coincida con Supabase y evitar choques de tipos
 interface MenuItem {
@@ -26,6 +26,11 @@ export default function AdminPanelPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados para búsqueda y ordenamiento
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'category'>('category');
+  const [sortOrder, setSortOrder] = useState<boolean>(true); // true = ascendente, false = descendente
+
   // Estados para el manejo de los formularios (Modales)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -42,17 +47,25 @@ export default function AdminPanelPage() {
     is_available: true,
   });
 
-  // 1. Cargar TODOS los productos
+  // 1. Cargar TODOS los productos desde Supabase aplicando ordenamiento en base de datos
   const fetchAllItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const { data, error: fetchError } = await supabase
-        .from('menu_items')
-        .select('*')
-        .order('category', { ascending: true })
-        .order('name', { ascending: true });
+      let query = supabase.from('menu_items').select('*');
+
+      // Aplicar orden dinámico según selección
+      if (sortBy === 'name') {
+        query = query.order('name', { ascending: sortOrder });
+      } else if (sortBy === 'price') {
+        query = query.order('price', { ascending: sortOrder });
+      } else {
+        // Orden por defecto por categoría, luego por nombre
+        query = query.order('category', { ascending: sortOrder }).order('name', { ascending: true });
+      }
+
+      const { data, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
       if (data) setMenuItems(data);
@@ -62,25 +75,24 @@ export default function AdminPanelPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sortBy, sortOrder]);
 
-  // 0. VERIFICAR SESIÓN Y CARGAR DATOS AL MONTAR EL COMPONENTE
+  // 0. CARGAR DATOS AL MONTAR EL COMPONENTE O CAMBIAR ORDEN
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  const loadData = async () => {
-    // Comentamos la autenticación un segundo para probar si trae los datos de una
-    if (isMounted) {
-      await fetchAllItems();
-    }
-  };
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchAllItems();
+      }
+    };
 
-  loadData();
+    loadData();
 
-  return () => {
-    isMounted = false;
-  };
-}, [fetchAllItems]);
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchAllItems]);
 
   // 2. Manejo del Cierre de Sesión
   const handleSignOut = async () => {
@@ -201,6 +213,17 @@ export default function AdminPanelPage() {
     }
   };
 
+  // Filtrar en tiempo real por barra de búsqueda (nombre, descripción o subcategoría)
+  const filteredItems = menuItems.filter((item) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(query) ||
+      (item.description && item.description.toLowerCase().includes(query)) ||
+      item.subcategory.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <main className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased">
       
@@ -226,7 +249,7 @@ export default function AdminPanelPage() {
       <section className="pt-28 pb-16 px-6 max-w-7xl mx-auto w-full">
         
         {/* Título y Botón Principal */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10 border-b border-stone-200 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 border-b border-stone-200 pb-6">
           <div className="space-y-1">
             <p className="text-xs font-bold uppercase tracking-widest text-[#185DF1]">Gestión de Menú QR</p>
             <h2 className="text-4xl font-black text-stone-950 tracking-tight uppercase">Panel de Control</h2>
@@ -238,6 +261,46 @@ export default function AdminPanelPage() {
             <Plus className="w-4 h-4" />
             Agregar Nuevo Plato
           </button>
+        </div>
+
+        {/* BARRA DE BÚSQUEDA Y FILTROS DE ORDEN */}
+        <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+          
+          {/* Buscador */}
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre, categoría..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B262A]/20 focus:border-[#8B262A]"
+            />
+          </div>
+
+          {/* Opciones de Ordenamiento */}
+          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 hidden sm:inline">Ordenar por:</span>
+            
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'category')}
+              className="px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm bg-stone-50 font-medium text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#8B262A]/20"
+            >
+              <option value="category">Categoría</option>
+              <option value="name">Nombre</option>
+              <option value="price">Precio</option>
+            </select>
+
+            <button
+              onClick={() => setSortOrder(!sortOrder)}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-stone-300 bg-stone-50 text-stone-700 hover:bg-stone-100 transition-colors text-xs font-bold uppercase"
+              title="Cambiar dirección de orden"
+            >
+              <ArrowUpDown className="w-4 h-4 text-stone-500" />
+              {sortOrder ? 'Asc' : 'Desc'}
+            </button>
+          </div>
         </div>
 
         {/* Manejo de errores */}
@@ -269,14 +332,14 @@ export default function AdminPanelPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100">
-                        {menuItems.length === 0 ? (
+                        {filteredItems.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className="text-center py-16 text-stone-500 italic">
-                                    No hay productos cargados en el menú. ¡Agrega el primero!
+                                    {searchQuery ? 'No se encontraron productos que coincidan con la búsqueda.' : 'No hay productos cargados en el menú. ¡Agrega el primero!'}
                                 </td>
                             </tr>
                         ) : (
-                            menuItems.map((item) => (
+                            filteredItems.map((item) => (
                                 <tr key={item.id} className={`hover:bg-stone-50 transition-colors ${item.is_available === false ? 'opacity-60 bg-stone-50/50' : ''}`}>
                                     
                                     {/* Producto */}
